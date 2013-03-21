@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012  Open Source and Linux Lab 
+ * Copyright 2011-2013 Open Source and Linux Lab
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,21 +35,21 @@
 #include <ns3/mobility-module.h>
 #include <ns3/network-module.h>
 
-#include "dispersion.h"
+#include "disappearance.h"
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE("Dispersion");
+NS_LOG_COMPONENT_DEFINE("Disappearance");
 
-Dispersion::Dispersion() :
+Disappearance::Disappearance() :
     MeshNetwork("dispersion"),
     m_initialRadius(0.0), m_movingSpeed(1200)
 {
-  LogComponentEnable("Dispersion", LOG_LEVEL_DEBUG);
+  LogComponentEnable("Disappearance", LOG_LEVEL_DEBUG);
 }
 
 void
-Dispersion::Configure(int argc, char * argv[])
+Disappearance::Configure(int argc, char * argv[])
 {
   MeshNetwork::Configure(argc, argv);
 
@@ -62,7 +62,7 @@ Dispersion::Configure(int argc, char * argv[])
 }
 
 void
-Dispersion::SetupMobility()
+Disappearance::SetupMobility()
 {
   int i = 1;
   NodeContainer::Iterator nodeIter = m_nodes.Begin();
@@ -99,7 +99,7 @@ Dispersion::SetupMobility()
 }
 
 void
-Dispersion::InstallApplications()
+Disappearance::InstallApplications()
 {
   UdpEchoServerHelper serverHelper(9);
   ApplicationContainer serverApps = serverHelper.Install(m_nodes.Get(0));
@@ -127,7 +127,7 @@ Dispersion::InstallApplications()
 }
 
 int
-Dispersion::Run()
+Disappearance::Run()
 {
   ns3::Packet::EnablePrinting(); //TODO where to put this thing?
 

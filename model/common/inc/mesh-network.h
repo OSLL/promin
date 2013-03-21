@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012  Open Source and Linux Lab 
+ * Copyright 2011-2013  Open Source and Linux Lab
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,30 +31,55 @@
 
 /* PROJ: OSLL/promin  */
 
-#include <ns3/applications-module.h>
+#include <ns3/core-module.h>
+#include <ns3/internet-module.h>
+#include <ns3/mesh-helper.h>
+#include <ns3/netanim-module.h>
 
-#include "mesh-network.h"
+#include <string.h>
+#include <auto_ptr.h>
 
-class Dispersion:
-  public MeshNetwork
+class MeshNetwork
 {
 public:
 
-  Dispersion();
+  MeshNetwork(const std::string& networkName, size_t nodesNumber = 5,
+              double totalTime = 1., double packetInterval = .1,
+              uint16_t packetSize = 1024);
   void Configure(int argc, char ** argv);
-  int Run();
 
-private:
+protected:
 
-  double m_initialRadius;
-  double m_movingSpeed;
+  const std::string m_networkName;
+  const size_t m_nodesNumber;
 
-  ns3::Ptr<ns3::UdpEchoServer> m_serverApp;
-  ns3::Ptr<ns3::UdpEchoClient> m_clientApp;
+  double m_totalTime;
+  double m_packetInterval;
+  uint16_t m_packetSize;
+  bool m_pcap;
+  bool m_xml;
+
+  ns3::MeshHelper m_meshHelper;
+  ns3::NodeContainer m_nodes;
+  ns3::NetDeviceContainer m_devices;
+  ns3::Ipv4InterfaceContainer m_interfaces;
+
+  std::auto_ptr<ns3::AnimationInterface> m_animator;
+
+public:
 
   /*!
-   * \brief Create nodes and split them to static and moving
+   * \brief Create nodes
    */
-  void SetupMobility();
-  void InstallApplications();
+  void CreateNodes();
+  void InstallDevices();
+  void InstallInternetStack();
+  void ConnectMxmlWriter();
+  void ActivateAnimator();
+
+  /*!
+   * \brief Report all nodes statistics into separate xml files
+   */
+  void Report();
+  void PrintNodePositions() const;
 };

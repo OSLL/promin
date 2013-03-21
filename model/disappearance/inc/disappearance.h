@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012  Open Source and Linux Lab 
+ * Copyright 2011-2013  Open Source and Linux Lab
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,12 +35,12 @@
 
 #include "mesh-network.h"
 
-class Dispersion:
+class Disappearance:
   public MeshNetwork
 {
 public:
 
-  Dispersion();
+  Disappearance();
   void Configure(int argc, char ** argv);
   int Run();
 

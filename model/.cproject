@@ -30,6 +30,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/simple/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/mxml_plugin/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ns3/build}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/disappearance/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/common/inc}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1866782521" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="NS3_LOG_ENABLE"/>
