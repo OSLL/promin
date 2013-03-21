@@ -214,7 +214,7 @@ Dispersion::Run () {
 void
 Dispersion::ConnectMxmlWriter ()
 {
-	map<MxmlWriter::Option, string> config;
+	std::map<MxmlWriter::Option, std::string> config;
 	
 	config[MxmlWriter::FILE_NAME] = "traces/trace.mxml";
 	config[MxmlWriter::PROGRAM_NAME] = "five-nodes-mesh";
