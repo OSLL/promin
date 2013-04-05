@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012  Open Source and Linux Lab 
+ * Copyright 2011-2013  Open Source and Linux Lab
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,18 +31,18 @@
 
 /* PROJ: OSLL/promin  */
 
-#ifndef __MXML_WRITER__
-#define __MXML_WRITER__
+#ifndef __XES_WRITER__
+#define __XES_WRITER__
 
 #include <tinyxml.h>
 
 #include "abstract-events-writer.h"
 
-class MxmlWriter : public AbstractEventsWriter
+class XesWriter : public AbstractEventsWriter
 {
 private:
 
-  static MxmlWriter s_instance;
+  static XesWriter s_instance;
 
   TiXmlDocument m_tiDocument;
   TiXmlElement * m_pProcInstTiElement;
@@ -54,12 +54,12 @@ protected:
 
 public:
 
-  static MxmlWriter& GetInstance();
+  static XesWriter& GetInstance();
 
   virtual void
   AddAuditEntry(AuditTrailEntry * entry);
 
-  virtual ~MxmlWriter();
+  virtual ~XesWriter();
 };
 
 #endif

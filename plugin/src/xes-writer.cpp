@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012  Open Source and Linux Lab 
+ * Copyright 2011-2013  Open Source and Linux Lab
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,24 +33,23 @@
 
 #include <iostream>
 
-#include "mxml-writer.h"
+#include "xes-writer.h"
 
-MxmlWriter MxmlWriter::s_instance;
+XesWriter XesWriter::s_instance;
 
-MxmlWriter&
-MxmlWriter::GetInstance()
+XesWriter&
+XesWriter::GetInstance()
 {
-  // TODO: type of exception?
   return s_instance;
 }
 
-MxmlWriter::~MxmlWriter()
+XesWriter::~XesWriter()
 {
   m_tiDocument.SaveFile(m_traceFileName.c_str());
 }
 
 void
-MxmlWriter::InitializeXmlDocument(const std::string& srcProgName,
+XesWriter::InitializeXmlDocument(const std::string& srcProgName,
     const std::string& processName, const std::string& procInstName)
 {
   TiXmlDeclaration * decl = new TiXmlDeclaration("1.0", "utf-8", "");
@@ -77,12 +76,12 @@ MxmlWriter::InitializeXmlDocument(const std::string& srcProgName,
   m_pProcInstTiElement = new TiXmlElement("ProcessInstance");
 
   m_pProcInstTiElement->SetAttribute("id", procInstName.c_str());
-  m_pProcInstTiElement->SetAttribute("description", "NS-3 trace in MXML format");
+  m_pProcInstTiElement->SetAttribute("description", "NS-3 trace in XES format");
   process->LinkEndChild(m_pProcInstTiElement);
 }
 
 void
-MxmlWriter::AddAuditEntry(AuditTrailEntry * entry)
+XesWriter::AddAuditEntry(AuditTrailEntry * entry)
 {
   m_pProcInstTiElement->LinkEndChild(entry);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012  Open Source and Linux Lab 
+ * Copyright 2011-2013  Open Source and Linux Lab
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,56 +33,42 @@
 
 #include <iostream>
 
-#include "mxml-writer.h"
+#include "abstract-events-writer.h"
+#include "actions.h"
+#include "actions-support.h"
 
-MxmlWriter MxmlWriter::s_instance;
-
-MxmlWriter&
-MxmlWriter::GetInstance()
+void
+AbstractEventsWriter::Connect(std::map<Option, std::string>& configuration)
 {
-  // TODO: type of exception?
-  return s_instance;
-}
-
-MxmlWriter::~MxmlWriter()
-{
-  m_tiDocument.SaveFile(m_traceFileName.c_str());
+  // TODO: check whether configuration contains everything
+  m_traceFileName = configuration[FILE_NAME];
+  InitializeXmlDocument(configuration[PROGRAM_NAME],
+      configuration[PROCESS_NAME], configuration[PROCESS_INSTANCE]);
+  ConnectCallbacks();
 }
 
 void
-MxmlWriter::InitializeXmlDocument(const std::string& srcProgName,
-    const std::string& processName, const std::string& procInstName)
+AbstractEventsWriter::ConnectCallbacks(CallbackFactory::CallbackType type_begin,
+    CallbackFactory::CallbackType type_end)
 {
-  TiXmlDeclaration * decl = new TiXmlDeclaration("1.0", "utf-8", "");
-
-  m_tiDocument.SetTabSize(2);
-  m_tiDocument.LinkEndChild(decl);
-
-  TiXmlElement * workflowLog = new TiXmlElement("WorkflowLog");
-
-  workflowLog->SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-  workflowLog->SetAttribute("xsi:noNamespaceSchemaLocation", "http://is.tm.tue.nl/research/processmining/WorkflowLog.xsd");
-  m_tiDocument.LinkEndChild(workflowLog);
-
-  TiXmlElement * source = new TiXmlElement("Source");
-
-  source->SetAttribute("program", srcProgName.c_str());
-  workflowLog->LinkEndChild(source);
-
-  TiXmlElement * process = new TiXmlElement("Process");
-
-  process->SetAttribute("id", processName.c_str());
-  workflowLog->LinkEndChild(process);
-
-  m_pProcInstTiElement = new TiXmlElement("ProcessInstance");
-
-  m_pProcInstTiElement->SetAttribute("id", procInstName.c_str());
-  m_pProcInstTiElement->SetAttribute("description", "NS-3 trace in MXML format");
-  process->LinkEndChild(m_pProcInstTiElement);
+  for (int type = type_begin + 1; type != type_end; ++type)
+    ConnectCallback((CallbackFactory::CallbackType) type);
 }
 
 void
-MxmlWriter::AddAuditEntry(AuditTrailEntry * entry)
+AbstractEventsWriter::ConnectCallbacks()
 {
-  m_pProcInstTiElement->LinkEndChild(entry);
+  std::auto_ptr<CallbackFactory> cb(new CallbackFactory());
+  m_pCallbackFactory = cb;
+
+  ConnectCallbacks(CallbackFactory::Mobility_Begin, CallbackFactory::Mobility_End);
+  ConnectCallbacks(CallbackFactory::Udp_Begin, CallbackFactory::Udp_End);
+  ConnectCallbacks(CallbackFactory::Phy_Begin, CallbackFactory::Phy_End);
+}
+
+void
+AbstractEventsWriter::ConnectCallback(CallbackFactory::CallbackType type)
+{
+  CallbackRecord rec = m_pCallbackFactory->GetCallbackRecord(type);
+  ns3::Config::Connect(rec.context, *rec.callback);
 }

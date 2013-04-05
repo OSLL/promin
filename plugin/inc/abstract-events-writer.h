@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012  Open Source and Linux Lab 
+ * Copyright 2011-2013  Open Source and Linux Lab
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,35 +31,45 @@
 
 /* PROJ: OSLL/promin  */
 
-#ifndef __MXML_WRITER__
-#define __MXML_WRITER__
+#ifndef __ABSTRACT_EVENTS_WRITER__
+#define __ABSTRACT_EVENTS_WRITER__
 
-#include <tinyxml.h>
+#include <string>
+#include <auto_ptr.h>
+#include <map>
 
-#include "abstract-events-writer.h"
+#include "callback-factory.h"
 
-class MxmlWriter : public AbstractEventsWriter
+class AbstractEventsWriter
 {
-private:
-
-  static MxmlWriter s_instance;
-
-  TiXmlDocument m_tiDocument;
-  TiXmlElement * m_pProcInstTiElement;
-
 protected:
 
-  virtual void  InitializeXmlDocument(const std::string& srcProgName,
-      const std::string& processName, const std::string& procInstName);
+  std::string m_traceFileName;
+  std::auto_ptr<CallbackFactory> m_pCallbackFactory;
+
+  virtual void InitializeXmlDocument (const std::string& srcProgName,
+      const std::string& processName, const std::string& procInstName) = 0;
+
+  void ConnectCallbacks (CallbackFactory::CallbackType, CallbackFactory::CallbackType type_end);
+  void ConnectCallback (CallbackFactory::CallbackType type);
+  void ConnectCallbacks ();
 
 public:
 
-  static MxmlWriter& GetInstance();
+  enum Option
+  {
+    FILE_NAME,
+    PROGRAM_NAME,
+    PROCESS_NAME,
+    PROCESS_INSTANCE,
+  };
 
-  virtual void
-  AddAuditEntry(AuditTrailEntry * entry);
+  void Connect(std::map<Option, std::string>& configuration);
+  virtual void AddAuditEntry(AuditTrailEntry * entry) = 0;
 
-  virtual ~MxmlWriter();
+  virtual ~AbstractEventsWriter()
+    {
+    }
 };
 
 #endif
