@@ -37,12 +37,18 @@
 #include <ns3/core-module.h>
 #include <ns3/mobility-module.h>
 
+class AbstractEventsWriter;
+
 /*!
  * \brief Callback actions
  * \note Callback signature is hard - so std::string, not const std::string&
  */
-namespace Action
+class EventsTracer
 {
+public:
+
+  EventsTracer(AbstractEventsWriter* eventsWriter);
+
   void DefaultAction();
   void UdpEchoTxAction(std::string context, ns3::Ptr<ns3::Packet const> packet);
 
@@ -54,6 +60,10 @@ namespace Action
   void PhyRxDropAction(std::string context, ns3::Ptr<ns3::Packet const> packet);
 
   void CourseChangeAction(std::string context, ns3::Ptr<ns3::MobilityModel const> model);
-}
+
+private:
+
+  AbstractEventsWriter* m_eventsWriter;
+};
 
 #endif

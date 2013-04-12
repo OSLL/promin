@@ -40,21 +40,21 @@
 
 class XesWriter : public AbstractEventsWriter
 {
-private:
-
-  static XesWriter s_instance;
-
   TiXmlDocument m_tiDocument;
   TiXmlElement * m_pProcInstTiElement;
+
+  TiXmlElement* createExtension(const char* name, const char* prefix, const char* uri);
+  TiXmlElement* createClassifier(const char* name, const char* keys);
+  TiXmlElement* createStringProperty(const char* key, const char* value);
+  TiXmlElement* createDateProperty(const char* key, const char* value);
+  TiXmlElement* createEventGlobalScope();
 
 protected:
 
   virtual void  InitializeXmlDocument(const std::string& srcProgName,
-      const std::string& processName, const std::string& procInstName);
+        const std::string& processName, const std::string& procInstName);
 
 public:
-
-  static XesWriter& GetInstance();
 
   virtual void
   AddAuditEntry(AuditTrailEntry * entry);

@@ -39,18 +39,19 @@
 
 #include <ns3/core-module.h>
 #include "audit-trail-entry.h"
+#include "actions.h"
 
 struct CallbackRecord
 {
-	CallbackRecord () {}
-	
-	CallbackRecord (ns3::CallbackBase * callback,
-			const std::string& context, const std::string& name) :
-				callback (callback), context (context), name (name) {}
-	
-	ns3::CallbackBase * callback;
-	std::string context;
-	std::string name;
+  CallbackRecord () {}
+
+  CallbackRecord (ns3::CallbackBase * callback,
+      const std::string& context, const std::string& name) :
+        callback (callback), context (context), name (name) {}
+
+  ns3::CallbackBase * callback;
+  std::string context;
+  std::string name;
 };
 
 struct BadCallbackTypeException : public std::exception
@@ -61,6 +62,8 @@ struct BadCallbackTypeException : public std::exception
    }
 };
 
+class AbstractEventsWriter;
+
 class CallbackFactory
 {
 
@@ -68,7 +71,7 @@ public:
 
   enum CallbackType
   {
-  	Begin,
+    Begin,
   	
     Udp_Begin,
     UdpEchoTx,
@@ -90,15 +93,15 @@ public:
     End,
   };
 
-  CallbackFactory();
+  CallbackFactory(AbstractEventsWriter* eventsWriter);
 
   const CallbackRecord& GetCallbackRecord (CallbackType type);
 
 private:
 
   std::map<CallbackType, CallbackRecord> m_callbacks;
+  EventsTracer m_eventsTracer;
 
-  CallbackRecord MakeDefaultCallbackRecord (std::string name);
   CallbackRecord MakeCallbackRecord (ns3::CallbackBase * callback, 
   		std::string context, std::string name);
   ns3::CallbackBase * GetPacketCallback (CallbackType type);

@@ -35,81 +35,84 @@
 
 #include "actions.h"
 #include "actions-support.h"
-#include "mxml-writer.h"
+#include "abstract-events-writer.h"
 
-namespace Action
+using namespace ns3;
+
+EventsTracer::EventsTracer(AbstractEventsWriter* eventsWriter):
+        m_eventsWriter(eventsWriter)
 {
-  using namespace ns3;
+  assert(eventsWriter);
+}
 
-  void
-  DefaultAction()
-  {
-  }
+void
+EventsTracer::DefaultAction()
+{
+}
 
-  void
-  UdpEchoTxAction(std::string context, Ptr<Packet const> packet)
-  {
-    MxmlWriter::GetInstance().AddAuditEntry(
-        new PacketAuditTrialEntry ("UdpEchoTx", "complete", context, packet));
-  }
+void
+EventsTracer::UdpEchoTxAction(std::string context, Ptr<Packet const> packet)
+{
+  m_eventsWriter->AddAuditEntry(
+      new PacketAuditTrialEntry ("UdpEchoTx", "complete", context, packet));
+}
 
-  void
-  PhyTxBeginAction(std::string context, Ptr<Packet const> packet)
-  {
-    MxmlWriter::GetInstance().AddAuditEntry(
-        new PacketAuditTrialEntry ("PhyTxBegin", "complete", context, packet));
-  }
+void
+EventsTracer::PhyTxBeginAction(std::string context, Ptr<Packet const> packet)
+{
+  m_eventsWriter->AddAuditEntry(
+      new PacketAuditTrialEntry ("PhyTxBegin", "complete", context, packet));
+}
 
-  void
-  PhyTxEndAction(std::string context, Ptr<Packet const> packet)
-  {
-    MxmlWriter::GetInstance().AddAuditEntry(
-        new PacketAuditTrialEntry ("PhyTxEnd", "complete", context, packet));
-  }
+void
+EventsTracer::PhyTxEndAction(std::string context, Ptr<Packet const> packet)
+{
+  m_eventsWriter->AddAuditEntry(
+      new PacketAuditTrialEntry ("PhyTxEnd", "complete", context, packet));
+}
 
-  void
-  PhyTxDropAction(std::string context, Ptr<Packet const> packet)
-  {
-    MxmlWriter::GetInstance().AddAuditEntry(
-        new PacketAuditTrialEntry ("PhyTxDrop", "complete", context, packet));
-  }
+void
+EventsTracer::PhyTxDropAction(std::string context, Ptr<Packet const> packet)
+{
+  m_eventsWriter->AddAuditEntry(
+      new PacketAuditTrialEntry ("PhyTxDrop", "complete", context, packet));
+}
 
-  void
-  PhyRxBeginAction(std::string context, Ptr<Packet const> packet)
-  {
-    MxmlWriter::GetInstance().AddAuditEntry(
-        new PacketAuditTrialEntry("PhyRxBegin", "complete", context, packet));
-  }
+void
+EventsTracer::PhyRxBeginAction(std::string context, Ptr<Packet const> packet)
+{
+  m_eventsWriter->AddAuditEntry(
+      new PacketAuditTrialEntry("PhyRxBegin", "complete", context, packet));
+}
 
-  void
-  PhyRxEndAction(std::string context, Ptr<Packet const> packet)
-  {
-    MxmlWriter::GetInstance().AddAuditEntry(
-        new PacketAuditTrialEntry ("PhyRxEnd", "complete", context, packet));
-  }
+void
+EventsTracer::PhyRxEndAction(std::string context, Ptr<Packet const> packet)
+{
+  m_eventsWriter->AddAuditEntry(
+      new PacketAuditTrialEntry ("PhyRxEnd", "complete", context, packet));
+}
 
-  void
-  PhyRxDropAction(std::string context, Ptr<Packet const> packet)
-  {
-    MxmlWriter::GetInstance().AddAuditEntry(
-        new PacketAuditTrialEntry ("PhyRxDrop", "complete", context, packet));
-  }
+void
+EventsTracer::PhyRxDropAction(std::string context, Ptr<Packet const> packet)
+{
+  m_eventsWriter->AddAuditEntry(
+      new PacketAuditTrialEntry ("PhyRxDrop", "complete", context, packet));
+}
 
-  void
-  CourseChangeAction(std::string context, Ptr<MobilityModel const> model)
-  {
-    Vector position = model->GetPosition();
-    std::stringstream pos_ss;
-    pos_ss << context << " x = " << position.x << ", y = " << position.y;
+void
+EventsTracer::CourseChangeAction(std::string context, Ptr<MobilityModel const> model)
+{
+  Vector position = model->GetPosition();
+  std::stringstream pos_ss;
+  pos_ss << context << " x = " << position.x << ", y = " << position.y;
 
-    Vector velocity = model->GetVelocity();
-    std::stringstream vel_ss;
-    vel_ss << context << " x = " << velocity.x << ", y = " << velocity.y;
+  Vector velocity = model->GetVelocity();
+  std::stringstream vel_ss;
+  vel_ss << context << " x = " << velocity.x << ", y = " << velocity.y;
 
-    AuditTrailEntry * entry = new AuditTrailEntry("CourseChange", "complete",
-        context);
-    entry->AddData("Velocity", vel_ss.str());
-    entry->AddData("Velocity", pos_ss.str());
-    MxmlWriter::GetInstance().AddAuditEntry(entry);
-  }
+  AuditTrailEntry * entry = new AuditTrailEntry("CourseChange", "complete",
+      context);
+  entry->AddData("Velocity", vel_ss.str());
+  entry->AddData("Position", pos_ss.str());
+  m_eventsWriter->AddAuditEntry(entry);
 }

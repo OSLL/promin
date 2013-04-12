@@ -35,17 +35,71 @@
 
 #include "xes-writer.h"
 
-XesWriter XesWriter::s_instance;
-
-XesWriter&
-XesWriter::GetInstance()
-{
-  return s_instance;
-}
-
 XesWriter::~XesWriter()
 {
   m_tiDocument.SaveFile(m_traceFileName.c_str());
+}
+
+TiXmlElement*
+XesWriter::createExtension(const char* name, const char* prefix, const char* uri)
+{
+  TiXmlElement * extension = new TiXmlElement("extension");
+
+  extension->SetAttribute("name", name);
+  extension->SetAttribute("prefix", prefix);
+  extension->SetAttribute("uri", uri);
+
+  return extension;
+}
+
+TiXmlElement*
+XesWriter::createStringProperty(const char* key, const char* value)
+{
+  TiXmlElement * property = new TiXmlElement("string");
+
+  property->SetAttribute("key", key);
+  property->SetAttribute("value", value);
+
+  return property;
+}
+
+TiXmlElement*
+XesWriter::createDateProperty(const char* key, const char* value)
+{
+  TiXmlElement * property = new TiXmlElement("date");
+
+  property->SetAttribute("key", key);
+  property->SetAttribute("value", value);
+
+  return property;
+}
+
+TiXmlElement*
+XesWriter::createClassifier(const char* name, const char* keys)
+{
+  TiXmlElement * classifier = new TiXmlElement("classifier");
+
+  classifier->SetAttribute("name", name);
+  classifier->SetAttribute("keys", keys);
+
+  return classifier;
+}
+
+TiXmlElement*
+XesWriter::createEventGlobalScope()
+{
+  TiXmlElement * eventScope = new TiXmlElement("global");
+
+  eventScope->SetAttribute("scope", "event");
+  eventScope->LinkEndChild(createStringProperty("concept:name", "name"));
+  eventScope->LinkEndChild(createStringProperty("org:resource", "resource"));
+  eventScope->LinkEndChild(createDateProperty("time:timestamp", "2011-04-13T18:27:00.515+02:00"));
+  eventScope->LinkEndChild(createStringProperty("Position", "string"));
+  eventScope->LinkEndChild(createStringProperty("Velocity", "string"));
+  eventScope->LinkEndChild(createStringProperty("Size", "string"));
+  eventScope->LinkEndChild(createStringProperty("Tags", "string"));
+
+  return eventScope;
 }
 
 void
@@ -57,27 +111,24 @@ XesWriter::InitializeXmlDocument(const std::string& srcProgName,
   m_tiDocument.SetTabSize(2);
   m_tiDocument.LinkEndChild(decl);
 
-  TiXmlElement * workflowLog = new TiXmlElement("WorkflowLog");
+  TiXmlElement * log = new TiXmlElement("log");
 
-  workflowLog->SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-  workflowLog->SetAttribute("xsi:noNamespaceSchemaLocation", "http://is.tm.tue.nl/research/processmining/WorkflowLog.xsd");
-  m_tiDocument.LinkEndChild(workflowLog);
+  log->SetAttribute("xes.version", "1.0");
+  log->SetAttribute("xmlns", "http://code.deckfour.org/xes");
+  log->SetAttribute("xes.creator", "NS-3 process mining plugin");
+  m_tiDocument.LinkEndChild(log);
 
-  TiXmlElement * source = new TiXmlElement("Source");
+  log->LinkEndChild(createExtension("Concept", "concept", "http://code.deckfour.org/xes/concept.xesext"));
+  log->LinkEndChild(createExtension("Time", "time", "http://code.deckfour.org/xes/time.xesext"));
+  log->LinkEndChild(createExtension("Organizational", "org", "http://code.deckfour.org/xes/org.xesext"));
+  log->LinkEndChild(createEventGlobalScope());
+  log->LinkEndChild(createClassifier("Activity", "Activity"));
+  log->LinkEndChild(createClassifier("activity classifier", "Activity"));
 
-  source->SetAttribute("program", srcProgName.c_str());
-  workflowLog->LinkEndChild(source);
+  m_pProcInstTiElement = new TiXmlElement("trace");
 
-  TiXmlElement * process = new TiXmlElement("Process");
-
-  process->SetAttribute("id", processName.c_str());
-  workflowLog->LinkEndChild(process);
-
-  m_pProcInstTiElement = new TiXmlElement("ProcessInstance");
-
-  m_pProcInstTiElement->SetAttribute("id", procInstName.c_str());
-  m_pProcInstTiElement->SetAttribute("description", "NS-3 trace in XES format");
-  process->LinkEndChild(m_pProcInstTiElement);
+  m_pProcInstTiElement->LinkEndChild(createStringProperty("concept:name", procInstName.c_str()));
+  log->LinkEndChild(m_pProcInstTiElement);
 }
 
 void

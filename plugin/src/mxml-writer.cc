@@ -35,15 +35,6 @@
 
 #include "mxml-writer.h"
 
-MxmlWriter MxmlWriter::s_instance;
-
-MxmlWriter&
-MxmlWriter::GetInstance()
-{
-  // TODO: type of exception?
-  return s_instance;
-}
-
 MxmlWriter::~MxmlWriter()
 {
   m_tiDocument.SaveFile(m_traceFileName.c_str());

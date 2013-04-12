@@ -32,40 +32,36 @@
 /* PROJ: OSLL/promin  */
 
 #include <stdexcept>
+#include <boost/bind.hpp>
 
 #include <ns3/network-module.h>
 
-#include "callback-factory.h"
+#include "abstract-events-writer.h"
 #include "actions.h"
 
 namespace ns3
 {
-  template <typename R, typename T1, typename T2>
-  Callback<R,T1,T2>* MakeCallbackPtr (R (*fnPtr)(T1,T2)) {
-    return new Callback<R,T1,T2> (fnPtr, true, true);
-  }
-  template <typename R>
-  Callback<R>* MakeCallbackPtr (R (*fnPtr)()) {
-    return new Callback<R> (fnPtr, true, true);
-  }
+  template <typename T1, typename T2>
+    CallbackBase* MakeCallbackPtr (void (EventsTracer::*mem_ptr)(T1,T2), EventsTracer* obj) {
+      return new Callback<void,T1,T2> (obj, mem_ptr);
+    }
+
+    CallbackBase* MakeCallbackPtr (void (EventsTracer::*mem_ptr)(), EventsTracer* obj) {
+      return new Callback<void> (obj, mem_ptr);
+    }
 } // namespace ns3
 
-using namespace Action;
 using namespace ns3;
 
 CallbackRecord
 CallbackFactory::MakeCallbackRecord (CallbackBase * callback, std::string context, std::string name)
 {
-	CallbackRecord rec (callback, context, name);
-	return rec;
-}
-CallbackRecord
-CallbackFactory::MakeDefaultCallbackRecord (std::string name)
-{
-	return MakeCallbackRecord (MakeCallbackPtr (&DefaultAction), "/", name);
+  CallbackRecord rec (callback, context, name);
+  return rec;
 }
 
-CallbackFactory::CallbackFactory()
+CallbackFactory::CallbackFactory(AbstractEventsWriter* eventsWriter):
+  m_eventsTracer(eventsWriter)
 { 
   /*** Udp echo callbacks ***/
   for(int i = Udp_Begin + 1; i < Udp_End; ++i)
@@ -82,7 +78,7 @@ CallbackFactory::CallbackFactory()
   }
  
   /*** Mobility callbacks ***/
-  m_callbacks[CourseChange] = MakeCallbackRecord (MakeCallbackPtr (&CourseChangeAction),
+  m_callbacks[CourseChange] = MakeCallbackRecord (MakeCallbackPtr(&EventsTracer::CourseChangeAction, &m_eventsTracer),
                                                   GetPath(CourseChange), GetFriendlyName(CourseChange));
 }
 
@@ -98,22 +94,22 @@ CallbackFactory::GetCallbackRecord (CallbackType type)
 CallbackBase *
 CallbackFactory::GetPacketCallback(CallbackType type)
 {
-  static const std::pair<CallbackType, void (*)(std::string, Ptr<Packet const>)> _c[] =
+  static const std::pair<CallbackType, void (EventsTracer::*)(std::string, Ptr<Packet const>)> _c[] =
   {
-    std::make_pair(UdpEchoTx, &UdpEchoTxAction),
-    std::make_pair(PhyTxBegin, &PhyTxBeginAction),
-    std::make_pair(PhyTxDrop, &PhyTxDropAction),
-    std::make_pair(PhyTxEnd, &PhyTxEndAction),
-    std::make_pair(PhyRxBegin, &PhyRxBeginAction),
-    std::make_pair(PhyRxDrop, &PhyRxDropAction),
-    std::make_pair(PhyRxEnd, &PhyRxEndAction),
+    std::make_pair(UdpEchoTx, &EventsTracer::UdpEchoTxAction),
+    std::make_pair(PhyTxBegin, &EventsTracer::PhyTxBeginAction),
+    std::make_pair(PhyTxDrop, &EventsTracer::PhyTxDropAction),
+    std::make_pair(PhyTxEnd, &EventsTracer::PhyTxEndAction),
+    std::make_pair(PhyRxBegin, &EventsTracer::PhyRxBeginAction),
+    std::make_pair(PhyRxDrop, &EventsTracer::PhyRxDropAction),
+    std::make_pair(PhyRxEnd, &EventsTracer::PhyRxEndAction),
   };
-  static const std::map<CallbackType, void (*)(std::string, Ptr<Packet const>)> callbacks(_c, _c + sizeof(_c)/sizeof(*_c));
+  static const std::map<CallbackType, void (EventsTracer::*)(std::string, Ptr<Packet const>)> callbacks(_c, _c + sizeof(_c)/sizeof(*_c));
 
   if (!callbacks.count(type))
     throw std::domain_error("Callback function not defined");
 
-  return MakeCallbackPtr(callbacks.find(type)->second);
+  return MakeCallbackPtr(callbacks.find(type)->second, &m_eventsTracer);
 }
 
 const std::string&

@@ -58,7 +58,7 @@ AbstractEventsWriter::ConnectCallbacks(CallbackFactory::CallbackType type_begin,
 void
 AbstractEventsWriter::ConnectCallbacks()
 {
-  std::auto_ptr<CallbackFactory> cb(new CallbackFactory());
+  std::auto_ptr<CallbackFactory> cb(new CallbackFactory(this));
   m_pCallbackFactory = cb;
 
   ConnectCallbacks(CallbackFactory::Mobility_Begin, CallbackFactory::Mobility_End);

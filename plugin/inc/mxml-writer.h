@@ -40,10 +40,6 @@
 
 class MxmlWriter : public AbstractEventsWriter
 {
-private:
-
-  static MxmlWriter s_instance;
-
   TiXmlDocument m_tiDocument;
   TiXmlElement * m_pProcInstTiElement;
 
@@ -53,8 +49,6 @@ protected:
       const std::string& processName, const std::string& procInstName);
 
 public:
-
-  static MxmlWriter& GetInstance();
 
   virtual void
   AddAuditEntry(AuditTrailEntry * entry);
