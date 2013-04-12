@@ -31,6 +31,9 @@
 
 /* PROJ: OSLL/promin  */
 
+#ifndef MESH_NETWORK
+#define MESH_NETWORK
+
 #include <ns3/core-module.h>
 #include <ns3/internet-module.h>
 #include <ns3/mesh-helper.h>
@@ -38,6 +41,9 @@
 
 #include <string.h>
 #include <auto_ptr.h>
+
+#include "mxml-writer.h"
+#include "xes-writer.h"
 
 class MeshNetwork
 {
@@ -66,6 +72,9 @@ protected:
 
   std::auto_ptr<ns3::AnimationInterface> m_animator;
 
+  MxmlWriter m_mxmlWriter;
+  XesWriter m_xesWriter;
+
 public:
 
   /*!
@@ -75,6 +84,7 @@ public:
   void InstallDevices();
   void InstallInternetStack();
   void ConnectMxmlWriter();
+  void ConnectXesWriter();
   void ActivateAnimator();
 
   /*!
@@ -83,3 +93,5 @@ public:
   void Report();
   void PrintNodePositions() const;
 };
+
+#endif

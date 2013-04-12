@@ -39,12 +39,18 @@
  */
 
 #include "dispersion.h"
+#include "disappearance.h"
 
 int
 main (int argc, char * argv[]) {
   Dispersion dispersion;
+//  Disappearance disappearance;
 
   dispersion.Configure (argc, argv);
+//  disappearance.Configure (argc, argv);
 
-  return dispersion.Run ();
+  dispersion.Run ();
+//  disappearance.Run ();
+
+  return 0;
 }

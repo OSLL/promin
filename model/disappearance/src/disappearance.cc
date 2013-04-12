@@ -42,7 +42,7 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE("Disappearance");
 
 Disappearance::Disappearance() :
-    MeshNetwork("dispersion"),
+    MeshNetwork("disappearance"),
     m_initialRadius(0.0), m_movingSpeed(1200)
 {
   LogComponentEnable("Disappearance", LOG_LEVEL_DEBUG);
@@ -140,6 +140,7 @@ Disappearance::Run()
   Simulator::Stop(Seconds(m_totalTime));
 
   ConnectMxmlWriter();
+  ConnectXesWriter();
   ActivateAnimator();
 
   Simulator::Run();

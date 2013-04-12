@@ -140,6 +140,7 @@ Dispersion::Run()
   Simulator::Stop(Seconds(m_totalTime));
 
   ConnectMxmlWriter();
+  ConnectXesWriter();
   ActivateAnimator();
 
   Simulator::Run();

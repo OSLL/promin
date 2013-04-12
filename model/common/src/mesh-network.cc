@@ -42,7 +42,6 @@
 #include <ns3/network-module.h>
 
 #include "mesh-network.h"
-#include "mxml-writer.h"
 
 using namespace ns3;
 
@@ -119,14 +118,27 @@ MeshNetwork::InstallInternetStack()
 void
 MeshNetwork::ConnectMxmlWriter()
 {
-  std::map<MxmlWriter::Option, std::string> config;
+  std::map<AbstractEventsWriter::Option, std::string> config;
 
-  config[MxmlWriter::FILE_NAME] = TRACE_DIR + "trace-" + m_networkName + ".mxml";
-  config[MxmlWriter::PROGRAM_NAME] = m_networkName;
-  config[MxmlWriter::PROCESS_NAME] = "MeshNetwork test";
-  config[MxmlWriter::PROCESS_INSTANCE] = "1";
+  config[AbstractEventsWriter::FILE_NAME] = TRACE_DIR + "trace-" + m_networkName + ".mxml";
+  config[AbstractEventsWriter::PROGRAM_NAME] = m_networkName;
+  config[AbstractEventsWriter::PROCESS_NAME] = "MeshNetwork test";
+  config[AbstractEventsWriter::PROCESS_INSTANCE] = "1";
 
-  MxmlWriter::GetInstance().Connect(config);
+  m_mxmlWriter.Connect(config);
+}
+
+void
+MeshNetwork::ConnectXesWriter()
+{
+  std::map<AbstractEventsWriter::Option, std::string> config;
+
+  config[AbstractEventsWriter::FILE_NAME] = TRACE_DIR + "trace-" + m_networkName + ".xes";
+  config[AbstractEventsWriter::PROGRAM_NAME] = m_networkName;
+  config[AbstractEventsWriter::PROCESS_NAME] = "Dynamic mesh metwork test";
+  config[AbstractEventsWriter::PROCESS_INSTANCE] = "1";
+
+  m_xesWriter.Connect(config);
 }
 
 void
