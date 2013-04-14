@@ -73,7 +73,46 @@ MxmlWriter::InitializeXmlDocument(const std::string& srcProgName,
 }
 
 void
-MxmlWriter::AddAuditEntry(AuditTrailEntry * entry)
+MxmlWriter::AddAuditEntry(const AuditTrailEntry& entry)
 {
-  m_pProcInstTiElement->LinkEndChild(entry);
+  TiXmlElement * entryElem = new TiXmlElement ("AuditTrailEntry");
+  TiXmlElement * workflowElem = new TiXmlElement ("WorkflowModelElement");
+
+  workflowElem->LinkEndChild (new TiXmlText (entry.m_workflowModelElement.c_str()));
+  entryElem->LinkEndChild (workflowElem);
+
+  TiXmlElement * eventTypeElem = new TiXmlElement ("EventType");
+  eventTypeElem->LinkEndChild (new TiXmlText ("complete"));
+  entryElem->LinkEndChild (eventTypeElem);
+
+  time_t rawtime;
+  struct tm * timeinfo;
+  time (&rawtime);
+  timeinfo = localtime ( &rawtime );
+  TiXmlElement * timestampElem = new TiXmlElement ("Timestamp");
+  timestampElem->LinkEndChild (new TiXmlText (asctime (timeinfo)));
+  entryElem->LinkEndChild (timestampElem);
+
+  TiXmlElement * originatorTypeElem = new TiXmlElement ("Originator");
+  originatorTypeElem->LinkEndChild (new TiXmlText (entry.m_originator.c_str()));
+  entryElem->LinkEndChild (originatorTypeElem);
+
+  if(!entry.m_data.empty())
+    {
+      TiXmlElement * dataElem = new TiXmlElement ("Data");
+
+      for(std::map<std::string, std::string>::const_iterator iter = entry.m_data.begin();
+          iter !=entry.m_data.end(); ++iter)
+        {
+          TiXmlElement * attribute = new TiXmlElement ("Attribute");
+
+          attribute->SetAttribute ("name", iter->first.c_str());
+          attribute->LinkEndChild (new TiXmlText (iter->second.c_str()));
+          dataElem->LinkEndChild(attribute);
+        }
+
+      entryElem->LinkEndChild (dataElem);
+    }
+
+  m_pProcInstTiElement->LinkEndChild(entryElem);
 }

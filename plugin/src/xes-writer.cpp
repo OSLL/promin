@@ -91,13 +91,24 @@ XesWriter::createEventGlobalScope()
   TiXmlElement * eventScope = new TiXmlElement("global");
 
   eventScope->SetAttribute("scope", "event");
-  eventScope->LinkEndChild(createStringProperty("concept:name", "name"));
+  eventScope->LinkEndChild(createStringProperty("concept:name", "__INVALID__"));
   eventScope->LinkEndChild(createStringProperty("org:resource", "resource"));
   eventScope->LinkEndChild(createDateProperty("time:timestamp", "2011-04-13T18:27:00.515+02:00"));
   eventScope->LinkEndChild(createStringProperty("Position", "string"));
   eventScope->LinkEndChild(createStringProperty("Velocity", "string"));
   eventScope->LinkEndChild(createStringProperty("Size", "string"));
   eventScope->LinkEndChild(createStringProperty("Tags", "string"));
+
+  return eventScope;
+}
+
+TiXmlElement*
+XesWriter::createTraceGlobalScope()
+{
+  TiXmlElement * eventScope = new TiXmlElement("global");
+
+  eventScope->SetAttribute("scope", "trace");
+  eventScope->LinkEndChild(createStringProperty("concept:name", "__INVALID__"));
 
   return eventScope;
 }
@@ -121,9 +132,8 @@ XesWriter::InitializeXmlDocument(const std::string& srcProgName,
   log->LinkEndChild(createExtension("Concept", "concept", "http://code.deckfour.org/xes/concept.xesext"));
   log->LinkEndChild(createExtension("Time", "time", "http://code.deckfour.org/xes/time.xesext"));
   log->LinkEndChild(createExtension("Organizational", "org", "http://code.deckfour.org/xes/org.xesext"));
+  log->LinkEndChild(createTraceGlobalScope());
   log->LinkEndChild(createEventGlobalScope());
-  log->LinkEndChild(createClassifier("Activity", "Activity"));
-  log->LinkEndChild(createClassifier("activity classifier", "Activity"));
 
   m_pProcInstTiElement = new TiXmlElement("trace");
 
@@ -132,7 +142,26 @@ XesWriter::InitializeXmlDocument(const std::string& srcProgName,
 }
 
 void
-XesWriter::AddAuditEntry(AuditTrailEntry * entry)
+XesWriter::AddAuditEntry(const AuditTrailEntry& entry)
 {
-  m_pProcInstTiElement->LinkEndChild(entry);
+  TiXmlElement * eventElem = new TiXmlElement ("event");
+
+  eventElem->LinkEndChild (createStringProperty("concept:name", entry.m_workflowModelElement.c_str()));
+  eventElem->LinkEndChild (createStringProperty("org:resource", entry.m_originator.c_str()));
+
+  time_t rawtime;
+  struct tm timeinfo;
+  char timeString[256];
+
+  time (&rawtime);
+  gmtime_r(&rawtime, &timeinfo);
+  strftime(timeString, sizeof(timeString), "%FT%T%z", &timeinfo);
+
+  eventElem->LinkEndChild(createDateProperty("time:timestamp", timeString));
+
+  for(std::map<std::string, std::string>::const_iterator iter = entry.m_data.begin();
+      iter !=entry.m_data.end(); ++iter)
+    eventElem->LinkEndChild (createStringProperty(iter->first.c_str(), iter->second.c_str()));
+
+  m_pProcInstTiElement->LinkEndChild(eventElem);
 }

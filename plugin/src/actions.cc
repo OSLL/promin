@@ -32,9 +32,9 @@
 /* PROJ: OSLL/promin  */
 
 #include <sstream>
+#include <cassert>
 
 #include "actions.h"
-#include "actions-support.h"
 #include "abstract-events-writer.h"
 
 using namespace ns3;
@@ -54,49 +54,49 @@ void
 EventsTracer::UdpEchoTxAction(std::string context, Ptr<Packet const> packet)
 {
   m_eventsWriter->AddAuditEntry(
-      new PacketAuditTrialEntry ("UdpEchoTx", "complete", context, packet));
+      PacketAuditTrialEntry ("UdpEchoTx", context, packet));
 }
 
 void
 EventsTracer::PhyTxBeginAction(std::string context, Ptr<Packet const> packet)
 {
   m_eventsWriter->AddAuditEntry(
-      new PacketAuditTrialEntry ("PhyTxBegin", "complete", context, packet));
+      PacketAuditTrialEntry ("PhyTxBegin", context, packet));
 }
 
 void
 EventsTracer::PhyTxEndAction(std::string context, Ptr<Packet const> packet)
 {
   m_eventsWriter->AddAuditEntry(
-      new PacketAuditTrialEntry ("PhyTxEnd", "complete", context, packet));
+      PacketAuditTrialEntry ("PhyTxEnd", context, packet));
 }
 
 void
 EventsTracer::PhyTxDropAction(std::string context, Ptr<Packet const> packet)
 {
   m_eventsWriter->AddAuditEntry(
-      new PacketAuditTrialEntry ("PhyTxDrop", "complete", context, packet));
+      PacketAuditTrialEntry ("PhyTxDrop", context, packet));
 }
 
 void
 EventsTracer::PhyRxBeginAction(std::string context, Ptr<Packet const> packet)
 {
   m_eventsWriter->AddAuditEntry(
-      new PacketAuditTrialEntry("PhyRxBegin", "complete", context, packet));
+      PacketAuditTrialEntry("PhyRxBegin", context, packet));
 }
 
 void
 EventsTracer::PhyRxEndAction(std::string context, Ptr<Packet const> packet)
 {
   m_eventsWriter->AddAuditEntry(
-      new PacketAuditTrialEntry ("PhyRxEnd", "complete", context, packet));
+      PacketAuditTrialEntry ("PhyRxEnd", context, packet));
 }
 
 void
 EventsTracer::PhyRxDropAction(std::string context, Ptr<Packet const> packet)
 {
   m_eventsWriter->AddAuditEntry(
-      new PacketAuditTrialEntry ("PhyRxDrop", "complete", context, packet));
+      PacketAuditTrialEntry ("PhyRxDrop", context, packet));
 }
 
 void
@@ -110,9 +110,8 @@ EventsTracer::CourseChangeAction(std::string context, Ptr<MobilityModel const> m
   std::stringstream vel_ss;
   vel_ss << context << " x = " << velocity.x << ", y = " << velocity.y;
 
-  AuditTrailEntry * entry = new AuditTrailEntry("CourseChange", "complete",
-      context);
-  entry->AddData("Velocity", vel_ss.str());
-  entry->AddData("Position", pos_ss.str());
+  AuditTrailEntry entry("CourseChange", context);
+  entry.AddData("Velocity", vel_ss.str());
+  entry.AddData("Position", pos_ss.str());
   m_eventsWriter->AddAuditEntry(entry);
 }

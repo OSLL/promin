@@ -51,7 +51,7 @@ protected:
 public:
 
   virtual void
-  AddAuditEntry(AuditTrailEntry * entry);
+  AddAuditEntry(const AuditTrailEntry& entry);
 
   virtual ~MxmlWriter();
 };

@@ -35,44 +35,31 @@
 
 #include "audit-trail-entry.h"
 
-using namespace std;
-
 AuditTrailEntry::AuditTrailEntry (
 		const std::string& workflowModelElement,
-		const std::string& eventType,
 		const std::string& originator) : 
-				TiXmlElement ("AuditTrailEntry"),
-				data ("Data")
+			m_workflowModelElement(workflowModelElement),
+			m_originator(originator)
 {
-	LinkEndChild (&data);
-	
-  TiXmlElement * workflowElem = new TiXmlElement ("WorkflowModelElement");
-  workflowElem->LinkEndChild (new TiXmlText (workflowModelElement.c_str()));
-  LinkEndChild (workflowElem);  
-	
-  TiXmlElement * eventTypeElem = new TiXmlElement ("EventType");
-  eventTypeElem->LinkEndChild (new TiXmlText (eventType.c_str()));
-  LinkEndChild (eventTypeElem);  
-	
-  time_t rawtime;
-  struct tm * timeinfo;
-  time (&rawtime);
-  timeinfo = localtime ( &rawtime );
-  TiXmlElement * timestampElem = new TiXmlElement ("Timestamp");
-  timestampElem->LinkEndChild (new TiXmlText (asctime (timeinfo)));
-  LinkEndChild (timestampElem);
-
-  TiXmlElement * originatorTypeElem = new TiXmlElement ("Originator");
-  originatorTypeElem->LinkEndChild (new TiXmlText (originator.c_str()));
-  LinkEndChild (originatorTypeElem);  
 }
 
 void 
 AuditTrailEntry::AddData (const std::string& name, const std::string& content)
 {
-  TiXmlElement * attribute = new TiXmlElement ("Attribute");
-  attribute->SetAttribute ("name", name.c_str());
-  attribute->LinkEndChild (new TiXmlText (content.c_str()));
-  data.LinkEndChild (attribute);
+  m_data[name] = content;
 }
 
+PacketAuditTrialEntry::PacketAuditTrialEntry (
+    const std::string& workflowModelElement,
+    const std::string& context,
+    ns3::Ptr<ns3::Packet const> packet): AuditTrailEntry (workflowModelElement, context)
+{
+  std::stringstream ss;
+
+  ss << packet->GetSize();
+  AddData ("Size", ss.str());
+
+  ss.clear();
+  packet->PrintPacketTags (ss);
+  AddData ("Tags", ss.str());
+}

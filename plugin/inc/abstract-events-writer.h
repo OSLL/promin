@@ -65,7 +65,7 @@ public:
   };
 
   void Connect(std::map<Option, std::string>& configuration);
-  virtual void AddAuditEntry(AuditTrailEntry * entry) = 0;
+  virtual void AddAuditEntry(const AuditTrailEntry& entry) = 0;
 
   virtual ~AbstractEventsWriter()
     {

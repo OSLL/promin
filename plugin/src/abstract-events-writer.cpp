@@ -35,7 +35,6 @@
 
 #include "abstract-events-writer.h"
 #include "actions.h"
-#include "actions-support.h"
 
 void
 AbstractEventsWriter::Connect(std::map<Option, std::string>& configuration)

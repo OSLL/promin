@@ -48,6 +48,7 @@ class XesWriter : public AbstractEventsWriter
   TiXmlElement* createStringProperty(const char* key, const char* value);
   TiXmlElement* createDateProperty(const char* key, const char* value);
   TiXmlElement* createEventGlobalScope();
+  TiXmlElement* createTraceGlobalScope();
 
 protected:
 
@@ -57,7 +58,7 @@ protected:
 public:
 
   virtual void
-  AddAuditEntry(AuditTrailEntry * entry);
+  AddAuditEntry(const AuditTrailEntry& entry);
 
   virtual ~XesWriter();
 };

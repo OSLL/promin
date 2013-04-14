@@ -35,21 +35,30 @@
 #define __AUDIT_TRIAL_ENTRY__
 
 #include <string>
-#include <tinyxml.h>
+#include <map>
 
-class AuditTrailEntry : public TiXmlElement
-{	
+#include <ns3/core-module.h>
+#include <ns3/packet.h>
+
+struct AuditTrailEntry
+{
+  std::string m_workflowModelElement;
+  std::string m_originator;
+
+  std::map<std::string, std::string> m_data;
+
+  AuditTrailEntry(const std::string& workflowModelElement,
+      const std::string& originator);
+
+  void AddData(const std::string& name, const std::string& content);
+};
+
+class PacketAuditTrialEntry : public AuditTrailEntry
+{
 public:
-	
-	AuditTrailEntry(const std::string& workflowModelElement,
-	                  const std::string& eventType,
-	                  const std::string& originator);
-
-	void AddData (const std::string& name, const std::string& content);
-
-private:
-	
-	TiXmlElement data;
+  PacketAuditTrialEntry(const std::string& workflowModelElement,
+                           const std::string& context,
+                           ns3::Ptr<ns3::Packet const> packet);
 };
 
 #endif
